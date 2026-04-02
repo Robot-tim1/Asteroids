@@ -10,9 +10,10 @@ from shot import *
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+
 def main():
     pygame.init()
-    
+    font = pygame.font.SysFont('Arial', 32) 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
@@ -28,9 +29,10 @@ def main():
 
     pygame.time.Clock()
     dt = 0
-
+    score = 0
     while True:
         log_state()
+        text_surface = font.render(f"Score: {str(score)}", False, (255, 255, 255))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -48,11 +50,13 @@ def main():
                 if shot.collides_with(asteroid):
                     log_event("asteroid_shot")
                     shot.kill()
-                    asteroid.split()
+                    add_score = asteroid.split()
+                    score += add_score
 
         for things in drawable:    
             things.draw(screen)
-
+        
+        screen.blit(text_surface, (50, 50))
         pygame.display.flip()
 
         dt = pygame.time.Clock().tick(60) / 1000
