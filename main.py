@@ -18,7 +18,9 @@ def main():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
-    
+    dead = pygame.sprite.Group()
+
+    Dead_Player.containers = (updatable, drawable, dead)
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
@@ -30,9 +32,11 @@ def main():
     pygame.time.Clock()
     dt = 0
     score = 0
+    lives = 3
     while True:
         log_state()
         text_surface = font.render(f"Score: {str(score)}", False, (255, 255, 255))
+        text_surface_lives = font.render(f"Lives: {str(lives)}", False, (255, 255, 255))
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -41,11 +45,25 @@ def main():
         
         updatable.update(dt)
         
+        if player in dead:
+            if player.respawn_cooldown <= 0:
+                player.kill()
+                player = Player(player.position[0], player.position[1], player.rotation)
+            else:
+                player.respawn_cooldown -= dt
+        
         for asteroid in asteroids:
             if player.collides_with(asteroid):
-                log_event("player_hit")
-                print("Game over!")
-                sys.exit()
+                log_event("player_hit")               
+                if player in dead:
+                    pass
+                elif lives == 0:
+                    print("Game over!")
+                    sys.exit()
+                else:
+                    lives -= 1
+                    player.kill()
+                    player = Dead_Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
             for shot in shots:
                 if shot.collides_with(asteroid):
                     log_event("asteroid_shot")
@@ -55,7 +73,7 @@ def main():
 
         for things in drawable:    
             things.draw(screen)
-        
+        screen.blit(text_surface_lives, (50, 100))
         screen.blit(text_surface, (50, 50))
         pygame.display.flip()
 
