@@ -18,9 +18,11 @@ def main():
     drawable = pygame.sprite.Group()
     asteroids = pygame.sprite.Group()
     shots = pygame.sprite.Group()
+    respawned = pygame.sprite.Group()
     dead = pygame.sprite.Group()
 
-    Dead_Player.containers = (updatable, drawable, dead)
+    Dead_Player.containers = (updatable, dead)
+    Respawned_Player.containers = (updatable, drawable, respawned)
     Player.containers = (updatable, drawable)
     Asteroid.containers = (asteroids, updatable, drawable)
     AsteroidField.containers = (updatable)
@@ -55,22 +57,24 @@ def main():
         if player in dead:
             if player.respawn_cooldown <= 0:
                 player.kill()
+                player = Respawned_Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
+        if player in respawned:
+            if player.i_frames <= 0:
+                player.kill()
                 player = Player(player.position[0], player.position[1], player.rotation)
-            else:
-                player.respawn_cooldown -= dt
         
         for asteroid in asteroids:
-            if player.collides_with(asteroid):
-                log_event("player_hit")               
-                if player in dead:
-                    pass
-                elif lives == 0:
-                    print("Game over!")
-                    sys.exit()
-                else:
-                    lives -= 1
-                    player.kill()
-                    player = Dead_Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+            if player not in dead:
+                if player.collides_with(asteroid):
+                    log_event("player_hit")               
+                    if lives == 0:
+                        print("Game over!")
+                        sys.exit()
+                    else:
+                        lives -= 1
+                        player.kill()
+                        player = Dead_Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
             for shot in shots:
                 if shot.collides_with(asteroid):
                     log_event("asteroid_shot")

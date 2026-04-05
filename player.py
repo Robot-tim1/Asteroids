@@ -66,15 +66,22 @@ class Player(CircleShape):
         speed = rotated * PLAYER_SHOOT_SPEED
         shot.velocity += speed
 
-class Dead_Player(Player):
+class Respawned_Player(Player):
     def __init__(self, x, y):
-        super().__init__(x, y, rotation=0)
-        self.respawn_cooldown = PLAYER_DEATH_COOLDOWN_SECONDS
+        super().__init__(x, y, 0)
+        self.i_frames = PLAYER_DEATH_COOLDOWN_SECONDS
         self.count = 0
+    
+    def update(self, dt):
+        super().update(dt)
+        self.i_frames -= dt
+
+    def collides_with(self, other):
+        pass
     
     def draw(self, screen):
         self.count += 1
-        if self.respawn_cooldown < 0.5:
+        if self.i_frames < 0.5:
             pygame.draw.polygon(screen, "green", self.triangle(), 0)
             pygame.draw.polygon(screen, (0,160,0), self.triangle(), 3)
         elif self.count < 2:
@@ -82,3 +89,14 @@ class Dead_Player(Player):
             pygame.draw.polygon(screen, (0,160,0), self.triangle(), 3)
         elif self.count >= 3:
             self.count = 0
+
+class Dead_Player(Player):
+    def __init__(self, x, y):
+        super().__init__(x, y, 0)
+        self.respawn_cooldown = 1
+
+    def collides_with(self, other):
+        pass
+    
+    def update(self, dt):
+        self.respawn_cooldown -= dt
