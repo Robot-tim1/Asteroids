@@ -28,21 +28,28 @@ def main():
 
     field = AsteroidField()   
     player = Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-
+    
+    forward = pygame.Vector2(0, 1).rotate(180)
+    right = pygame.Vector2(0, 1).rotate(180 + 90) * 15 / 1.5
+    a = (145, 87) + forward * 15
+    b = (145, 87) - forward * 15 - right
+    c = (145, 87) - forward * 15 + right
+    triangle = [a,b,c]
+    
     pygame.time.Clock()
     dt = 0
     score = 0
     lives = 3
     while True:
         log_state()
-        text_surface = font.render(f"Score: {str(score)}", False, (255, 255, 255))
-        text_surface_lives = font.render(f"Lives: {str(lives)}", False, (255, 255, 255))
+        text_surface = font.render(f"Score {str(score)}", True, (255, 255, 255))
+        text_surface_lives = font.render(f"Lives {str(lives)}", True, (255, 255, 255)) 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
         
         screen.fill("black")
-        
+
         updatable.update(dt)
         
         if player in dead:
@@ -73,8 +80,11 @@ def main():
 
         for things in drawable:    
             things.draw(screen)
-        screen.blit(text_surface_lives, (50, 100))
-        screen.blit(text_surface, (50, 50))
+        screen.blit(text_surface_lives, (30, 70))
+        screen.blit(text_surface, (30, 20))
+        pygame.draw.polygon(screen, "black", triangle, 0)
+        pygame.draw.polygon(screen, "white", triangle, 3)
+        
         pygame.display.flip()
 
         dt = pygame.time.Clock().tick(60) / 1000
