@@ -3,13 +3,17 @@ from constants import *
 from circleshape import *
 from shot import *
 
+pygame.mixer.init(frequency=24000, size=-16, channels=2, buffer=1024)
+shoot_sound = pygame.mixer.Sound("assets/sounds/freesound_community-laser-45816.wav")
+shoot_sound.set_volume(0.4)
+
 class Player(CircleShape):
     
-    cooldown = 0
-    
-    def __init__(self, x, y, rotation=0):
+    def __init__(self, x, y, rotation=0, cooldown=0):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = rotation
+        self.cooldown = cooldown
+    
     def triangle(self):
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
         right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
@@ -64,6 +68,7 @@ class Player(CircleShape):
                 pass
             else:
                 self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS    
+                shoot_sound.play(fade_ms=50)
                 self.shoot()
 
     def shoot(self):

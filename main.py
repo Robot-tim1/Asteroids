@@ -13,6 +13,7 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 def main():
     pygame.init()
+    
     font = pygame.font.SysFont('Arial', 32) 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -62,7 +63,7 @@ def main():
         if player in respawned:
             if player.i_frames <= 0:
                 player.kill()
-                player = Player(player.position[0], player.position[1], player.rotation)
+                player = Player(player.position[0], player.position[1], player.rotation, player.cooldown)
         
         for asteroid in asteroids:
             if player not in dead:
