@@ -3,7 +3,7 @@ from constants import *
 from circleshape import *
 from shot import *
 
-pygame.mixer.init(frequency=24000, size=-16, channels=2, buffer=1024)
+pygame.mixer.init(frequency=24000, size=-16, channels=2, buffer=512)
 shoot_sound = pygame.mixer.Sound("assets/sounds/freesound_community-laser-45816.wav")
 shoot_sound.set_volume(0.4)
 
