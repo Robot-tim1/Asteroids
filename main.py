@@ -10,10 +10,13 @@ from shot import *
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-
 def main():
+    pygame.mixer.pre_init(frequency=24000, size=-16, channels=2, buffer=512)
     pygame.init()
     
+    death_sound = pygame.mixer.Sound("assets/sounds/30360796_8-bit-death-sound_by_alexander_blu_preview.wav")
+    death_sound.set_volume(0.4)
+
     font = pygame.font.SysFont('Arial', 32) 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
@@ -43,6 +46,7 @@ def main():
     dt = 0
     score = 0
     lives = 3
+    life_reward = 2500
     while True:
         log_state()
         text_surface = font.render(f"Score {str(score)}", True, (255, 255, 255))
@@ -66,22 +70,25 @@ def main():
                 player = Player(player.position[0], player.position[1], player.rotation, player.cooldown)
         
         for asteroid in asteroids:
-            if player not in dead:
-                if player.collides_with(asteroid):
-                    log_event("player_hit")               
-                    if lives == 0:
-                        print("Game over!")
-                        sys.exit()
-                    else:
-                        lives -= 1
-                        player.kill()
-                        player = Dead_Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+            if player.collides_with(asteroid):
+                log_event("player_hit")               
+                if lives == 0:
+                    print("Game over!")
+                    sys.exit()
+                else:
+                    lives -= 1
+                    player.kill()
+                    player = Dead_Player(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+                    death_sound.play()
             for shot in shots:
                 if shot.collides_with(asteroid):
                     log_event("asteroid_shot")
                     shot.kill()
                     add_score = asteroid.split()
                     score += add_score
+                    if score > life_reward:
+                        lives += 1
+                        life_reward *= 2
 
         for things in drawable:    
             things.draw(screen)
